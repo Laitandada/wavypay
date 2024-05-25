@@ -1,18 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { register as registerUser } from '../store/authSlice';
-import { TextField, Button, Box, CircularProgress } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Typography,  IconButton,
+    InputAdornment } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { OverallContainer,Container } from './dashboard.styled';
+import { OverallContainer,Container, ContainerText, ContainerTextImage } from './dashboard.styled';
 
+  import { Visibility, VisibilityOff } from "@mui/icons-material";
 const Register = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { loading, error, isLoggedIn } = useSelector((state) => state.auth);
+  const { loading, isLoggedIn } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
 
   const onSubmit = (data) => {
     dispatch(registerUser(data))
@@ -30,18 +39,26 @@ const Register = () => {
     if (isLoggedIn) {
       navigate('/dashboard');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn,navigate]);
 
   return (
     <OverallContainer>
- 
-      <Container
-      sx={{
-     
-      }}
-    >
-       
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+      <Container>
+        <ContainerTextImage>
+          <Box sx={{ marginTop: 5 }}>
+            <img src="../assets/API-banking.png" alt="NFT Example" />
+          </Box>
+        </ContainerTextImage>
+        <ContainerText>
+        <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            sx={{ backgroundColor:"white",padding:3,borderRadius:"7px" }}
+          >
+             <Typography variant="h4" gutterBottom sx={{color:"black",mt:5}}>
+           WavyPay
+      </Typography>
       <TextField
         margin="normal"
         required
@@ -73,21 +90,38 @@ const Register = () => {
         helperText={errors.email?.message}
       />
       <TextField
-        margin="normal"
-        required
-        fullWidth
-        label="Password"
-        type="password"
-        {...register('password', {
-          required: 'Password is required',
-          minLength: {
-            value: 6,
-            message: 'Password must be at least 6 characters',
-          },
-        })}
-        error={!!errors.password}
-        helperText={errors.password?.message}
-      />
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+                pattern: {
+                  value: /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{6,}$/,
+                  message: "Password must include at least one letter, one number, and one symbol",
+                },
+              })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
       <Button
         type="submit"
         fullWidth
@@ -97,10 +131,17 @@ const Register = () => {
       >
         {loading ? <CircularProgress size={24} /> : 'Register'}
       </Button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+
+
+
+      <Typography variant="h6" gutterBottom sx={{color:"black",pb: 5,mt:1}}>
+          Already have an account?  <a href='/login'>Login</a>
+      </Typography>
     </Box>
 
-    </Container>
+    </ContainerText>
+      </Container>
     </OverallContainer>
   );
 };

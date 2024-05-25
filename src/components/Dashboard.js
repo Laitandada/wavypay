@@ -3,16 +3,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { Typography, Box, Button } from "@mui/material";
 import { logout } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
-import { Container, ContainerText, OverallContainer } from "./dashboard.styled";
+import { Container, ContainerText, ContainerTextImage, OverallContainer } from "./dashboard.styled";
+import { useSnackbar } from "notistack";
 
 const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const { enqueueSnackbar } = useSnackbar();
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
+    enqueueSnackbar("Logout successful!", { variant: "success" });
   };
 
   return (
@@ -25,13 +27,13 @@ const Dashboard = () => {
     >
        
         <ContainerText>
-        <Typography variant="h5" gutterBottom>
-           Wakabuy
+        <Typography variant="h1" gutterBottom>
+        WavyPay
       </Typography>
-           <Typography variant="h2" gutterBottom>
-           Welcome to the your Dashboard, 
+           <Typography variant="h3" gutterBottom>
+           Welcome to your dashboard
       </Typography>
-      <Typography variant="h3" gutterBottom>
+      <Typography variant="h4" gutterBottom>
       {user.username}!
       </Typography>
       <Button
@@ -43,12 +45,12 @@ const Dashboard = () => {
         Log out
       </Button>    
         </ContainerText>
-    <ContainerText>
+    <ContainerTextImage>
         <Box sx={{ marginTop: 5 }}>
         <img src="../assets/wakabuy.png" alt="NFT Example" />
       </Box>
      
-    </ContainerText>
+    </ContainerTextImage>
     
     </Container>    
     </OverallContainer>

@@ -5,11 +5,11 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import store from "./store/store";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import { Container, CssBaseline } from "@mui/material";
+
 import { SnackbarProvider } from "notistack";
 import Dashboard from "./components/Dashboard";
 

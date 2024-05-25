@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import { login } from "../store/authSlice";
 import {
-  TextField,
-  Button,
-  Box,
-  CircularProgress,
-  Typography,
-  
-} from "@mui/material";
+    TextField,
+    Button,
+    Box,
+    CircularProgress,
+    Typography,
+    IconButton,
+    InputAdornment
+  } from "@mui/material";
+  import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import {Container, ContainerText, OverallContainer } from "./dashboard.styled";
+import {
+  Container,
+  ContainerText,
+  ContainerTextImage,
+  OverallContainer,
+} from "./dashboard.styled";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -22,10 +29,14 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { loading, error, isLoggedIn } = useSelector((state) => state.auth);
+  const { loading, isLoggedIn } = useSelector((state) => state.auth);
   console.log(isLoggedIn);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
+  const handleClickShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
   const onSubmit = (data) => {
     dispatch(login(data))
       .unwrap()
@@ -34,7 +45,7 @@ const Login = () => {
         navigate("/dashboard");
       })
       .catch((err) => {
-        enqueueSnackbar(err, { variant: "error" });
+        enqueueSnackbar("Unable to login", { variant: "error" });
       });
   };
 
@@ -42,26 +53,30 @@ const Login = () => {
     if (isLoggedIn) {
       navigate("/dashboard");
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn,navigate]);
 
   return (
     <OverallContainer>
       <Container sx={{}}>
-        <ContainerText>
+        <ContainerTextImage>
           <Box sx={{ marginTop: 5 }}>
             <img src="../assets/API-banking.png" alt="NFT Example" />
           </Box>
-        </ContainerText>
+        </ContainerTextImage>
         <ContainerText>
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
             noValidate
-            sx={{ mt: 1,backgroundColor:"white",padding:3 }}
+            sx={{ backgroundColor: "white", padding: 3, borderRadius: "7px" }}
           >
-             <Typography variant="h5" gutterBottom sx={{color:"black"}}>
-           Wakabuy
-      </Typography>
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{ color: "black", mt: 5 }}
+            >
+              WavyPay
+            </Typography>
             <TextField
               margin="normal"
               required
@@ -77,21 +92,38 @@ const Login = () => {
               error={!!errors.email}
               helperText={errors.email?.message}
             />
-            <TextField
+           <TextField
               margin="normal"
               required
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
                   value: 6,
                   message: "Password must be at least 6 characters",
                 },
+                pattern: {
+                  value: /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{6,}$/,
+                  message: "Hi there, the password you gave us includes at least one letter, one number, and one symbol",
+                },
               })}
               error={!!errors.password}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"
@@ -102,7 +134,14 @@ const Login = () => {
             >
               {loading ? <CircularProgress size={24} /> : "Sign In"}
             </Button>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: "black", pb: 5, mt: 1 }}
+            >
+              Don't have an account? <a href="/register">Register</a>
+            </Typography>
           </Box>
         </ContainerText>
       </Container>
